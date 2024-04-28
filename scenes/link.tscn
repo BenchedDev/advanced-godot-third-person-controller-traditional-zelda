@@ -1,0 +1,158 @@
+[gd_scene load_steps=17 format=3 uid="uid://bs7hibqid2rpk"]
+
+[ext_resource type="Script" path="res://scripts/entity_component/input_component.gd" id="1_3tw28"]
+[ext_resource type="PackedScene" uid="uid://cqs16upjxap14" path="res://assets/human.gltf" id="1_ggegp"]
+[ext_resource type="Script" path="res://scripts/entity_component/player_movement_component.gd" id="2_lv8q8"]
+[ext_resource type="Resource" uid="uid://d1db5y5jleclw" path="res://resources/player_stats.tres" id="3_pas83"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/player_movement_machine.gd" id="4_g7x7s"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/player_movement_state.gd" id="5_r6d7m"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/states/player_idle.gd" id="6_c4xfe"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/states/player_obstacle_hop.gd" id="6_j1oo0"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/states/player_ledge.gd" id="6_nd54w"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/states/player_roll.gd" id="6_salax"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/states/player_jump.gd" id="7_3sf5j"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/states/player_fall.gd" id="7_32u74"]
+[ext_resource type="Script" path="res://scripts/state_machine/player_movement/states/player_walk.gd" id="8_3c3q8"]
+[ext_resource type="Script" path="res://scripts/third_person_cam.gd" id="9_4j8y1"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bje7e"]
+radius = 0.3
+
+[sub_resource type="GDScript" id="GDScript_84073"]
+resource_name = "testing_player_label"
+script/source = "extends Label3D
+
+@export var movement_machine : StateMachine
+
+func _process(_delta: float) -> void:
+	text = (
+		\"\" +
+		\"current state -> %s\" % (movement_machine.current_state.state_name if movement_machine else \"no movement machine\")
+	)
+"
+
+[node name="Link" type="CharacterBody3D"]
+
+[node name="InputComponent" type="Node" parent="."]
+script = ExtResource("1_3tw28")
+
+[node name="Movement" type="Node3D" parent="."]
+
+[node name="PlayerMovementComponent" type="Node" parent="Movement" node_paths=PackedStringArray("body", "input", "face_with_node", "model_container", "movement_spatial", "anim_player")]
+script = ExtResource("2_lv8q8")
+body = NodePath("../..")
+stats = ExtResource("3_pas83")
+input = NodePath("../../InputComponent")
+face_with_node = NodePath("../../CamBase/HRot")
+model_container = NodePath("../../Visual/ModelContainer")
+movement_spatial = NodePath("..")
+anim_player = NodePath("../../Visual/ModelContainer/blockbench_export/AnimationPlayer")
+
+[node name="MovementMachine" type="Node" parent="Movement" node_paths=PackedStringArray("movement", "initial_state")]
+script = ExtResource("4_g7x7s")
+movement = NodePath("../PlayerMovementComponent")
+initial_state = NodePath("Idle")
+
+[node name="PlayerMovementState" type="Node" parent="Movement/MovementMachine"]
+script = ExtResource("5_r6d7m")
+
+[node name="Roll" type="Node" parent="Movement/MovementMachine" node_paths=PackedStringArray("ground_ray")]
+script = ExtResource("6_salax")
+ground_ray = NodePath("../../RayContainer/GroundRay")
+
+[node name="Ledge" type="Node" parent="Movement/MovementMachine" node_paths=PackedStringArray("head_ray", "head_down_ray")]
+script = ExtResource("6_nd54w")
+head_ray = NodePath("../../RayContainer/HeadRay")
+head_down_ray = NodePath("../../RayContainer/HeadDownRay")
+
+[node name="ObstacleHop" type="Node" parent="Movement/MovementMachine"]
+script = ExtResource("6_j1oo0")
+
+[node name="Idle" type="Node" parent="Movement/MovementMachine"]
+script = ExtResource("6_c4xfe")
+
+[node name="Jump" type="Node" parent="Movement/MovementMachine"]
+script = ExtResource("7_3sf5j")
+
+[node name="Fall" type="Node" parent="Movement/MovementMachine" node_paths=PackedStringArray("head_ray", "head_down_ray")]
+script = ExtResource("7_32u74")
+head_ray = NodePath("../../RayContainer/HeadRay")
+head_down_ray = NodePath("../../RayContainer/HeadDownRay")
+
+[node name="Walk" type="Node" parent="Movement/MovementMachine" node_paths=PackedStringArray("ground_ray", "foot_ray", "chest_ray", "head_ray", "head_down_ray")]
+script = ExtResource("8_3c3q8")
+ground_ray = NodePath("../../RayContainer/GroundRay")
+foot_ray = NodePath("../../RayContainer/FootRay")
+chest_ray = NodePath("../../RayContainer/ChestRay")
+head_ray = NodePath("../../RayContainer/HeadRay")
+head_down_ray = NodePath("../../RayContainer/HeadDownRay")
+
+[node name="RayContainer" type="Node3D" parent="Movement"]
+
+[node name="GroundRay" type="RayCast3D" parent="Movement/RayContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0.3)
+target_position = Vector3(0, -0.4, 0)
+
+[node name="FootRay" type="RayCast3D" parent="Movement/RayContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+target_position = Vector3(0, 0, 0.4)
+
+[node name="ChestRay" type="RayCast3D" parent="Movement/RayContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+target_position = Vector3(0, 0, 0.4)
+
+[node name="HeadRay" type="RayCast3D" parent="Movement/RayContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+target_position = Vector3(0, 0, 0.6)
+
+[node name="HeadDownRay" type="RayCast3D" parent="Movement/RayContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0.6)
+target_position = Vector3(0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_bje7e")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="ModelContainer" type="Node3D" parent="Visual"]
+
+[node name="blockbench_export" parent="Visual/ModelContainer" instance=ExtResource("1_ggegp")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="root" parent="Visual/ModelContainer/blockbench_export/Node" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.125, 0)
+
+[node name="left_arm" parent="Visual/ModelContainer/blockbench_export/Node/root/torso" index="1"]
+transform = Transform3D(1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, -0.25, 0.6875, 0)
+
+[node name="right_arm" parent="Visual/ModelContainer/blockbench_export/Node/root/torso" index="2"]
+transform = Transform3D(1, 0, 0, 0, -1, 8.74228e-08, 0, -8.74228e-08, -1, 0.25, 0.6875, 0)
+
+[node name="Label3D" type="Label3D" parent="Visual" node_paths=PackedStringArray("movement_machine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+billboard = 1
+double_sided = false
+text = "fda"
+script = SubResource("GDScript_84073")
+movement_machine = NodePath("../../Movement/MovementMachine")
+
+[node name="CamBase" type="Node3D" parent="." node_paths=PackedStringArray("h_rot", "v_rot", "input", "target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+script = ExtResource("9_4j8y1")
+h_rot = NodePath("HRot")
+v_rot = NodePath("HRot/VRot")
+input = NodePath("../InputComponent")
+target = NodePath("../Visual/ModelContainer")
+
+[node name="HRot" type="Node3D" parent="CamBase"]
+
+[node name="VRot" type="Node3D" parent="CamBase/HRot"]
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CamBase/HRot/VRot"]
+spring_length = 3.0
+
+[node name="Camera3D" type="Camera3D" parent="CamBase/HRot/VRot/SpringArm3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+
+[editable path="Visual/ModelContainer/blockbench_export"]

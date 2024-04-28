@@ -1,0 +1,9 @@
+res://scenes/demo_scene.tscn
+res://resources/player_stats.tres
+res://scripts/state_machine/player_movement/states/player_idle.gd
+res://assets/anims/idle.res
+res://scripts/state_machine/player_movement/states/player_jump.gd
+res://scenes/link.tscn
+res://scripts/resoure_templates/movement_stats.gd
+res://scripts/state_machine/player_movement/states/player_roll.gd
+res://scripts/state_machine/player_movement/states/player_walk.gd

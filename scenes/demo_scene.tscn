@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://8w0j2u1wtr0v"]
+
+[ext_resource type="PackedScene" uid="uid://bs7hibqid2rpk" path="res://scenes/link.tscn" id="1_8v6cq"]
+
+[sub_resource type="Environment" id="Environment_wptcg"]
+background_mode = 1
+background_color = Color(0, 0.458824, 0.737255, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.568627, 0.568627, 0.568627, 1)
+
+[node name="DemoScene" type="Node3D"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.402747, 0.915311, 0, -0.915311, 0.402747, 0, 0, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_wptcg")
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D"]
+size = Vector3(30, 1, 30)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, 0)
+size = Vector3(5, 2, 5)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.5, 0)
+size = Vector3(5, 2, 5)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 0)
+size = Vector3(5, 4, 5)
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 8)
+size = Vector3(5, 4, 5)
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, -10)
+size = Vector3(5, 4, 5)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="CSGCombiner3D"]
+transform = Transform3D(0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 0, 0, 1, 7.53185, 0.382362, 0)
+size = Vector3(9, 2, 5)
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="CSGCombiner3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
+radius = 3.0
+
+[node name="Link" parent="." instance=ExtResource("1_8v6cq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 6, 7)

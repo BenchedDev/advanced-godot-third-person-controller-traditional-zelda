@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="MovementStats" load_steps=2 format=3 uid="uid://d1db5y5jleclw"]
+
+[ext_resource type="Script" path="res://scripts/resoure_templates/movement_stats.gd" id="1_ii5ao"]
+
+[resource]
+script = ExtResource("1_ii5ao")
+move_speed = 500.0
+gravity_speed = 36.0
+air_control_enabled = true
+air_control_percentage = 0.1
+air_speed = 300.0
+max_air_speed = 9.0
+jump_velocity = 8.0
+jump_speed = 9.0
+hop_velocity = 10.0
+hop_speed = 8.0
+hop_buffer = 0.2
+ledge_buffer = 0.3
+height = 2.0
+half_width = 0.3
